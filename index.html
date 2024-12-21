@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's in the Clod</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+        }
+        h1 {
+            color: red;
+        }
+        #game {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            background-color: #2d6a4f;
+            border: 2px solid #1b4332;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
+        }
+        .cell.detected {
+            background-color: brown;
+            cursor: default;
+        }
+        #score {
+            font-size: 20px;
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #1b4332;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #2d6a4f;
+        }
+        #logo {
+            margin: 20px auto;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <img id="logo" src="C:\Users\User\OneDrive\Desktop\Game\logo.png" alt="Group Logo">
+    <h1>What's in the Clod</h1>
+    <div>
+        <label for='playerName'>Enter your name: </label>
+        <input type='text' id='playerName' placeholder='Your Name' style='font-size: 20px; padding: 10px; width: 300px;'>
+    </div>
+    <p id="score">Score: 0</p>
+    <div id="game"></div>
+    <div id="legend">
+        <h2>Item Values</h2>
+        <p><strong>Gold Coin:</strong> 100 points</p>
+        <p><strong>Coin:</strong> 5 points</p>
+        <p><strong>Relic:</strong> 10 points</p>
+        <p><strong>Trash:</strong> -2 points</p>
+        <p><strong>Iron Ring:</strong> 0 points</p>
+    </div>
+    <button onclick="startGame()">Restart Game</button>
+
+    <script>
+        const gridSize = 8;
+        const totalCells = gridSize * gridSize;
+        const items = ['Gold Coin', 'Coin', 'Relic', 'Trash', 'Trash', 'Trash', 'Trash', 'Trash', 'Trash', 'Iron Ring'];
+        const points = {
+            'Gold Coin': 100,
+            Coin: 5,
+            Relic: 10,
+            Trash: -2,
+            'Iron Ring': 0,
+        };
+
+        let score = 0;
+        let gameGrid = [];
+        let clicksRemaining = 10;
+
+        const scoreElement = document.getElementById('score');
+        const gameElement = document.getElementById('game');
+
+        function createGrid() {
+            gameGrid = Array.from({ length: totalCells }, () => {
+                const randomItem = items[Math.floor(Math.random() * items.length)];
+                return randomItem;
+            });
+        }
+
+        function renderGrid() {
+            gameElement.innerHTML = '';
+            gameGrid.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.setAttribute('data-index', index);
+                cell.addEventListener('click', detectItem);
+                gameElement.appendChild(cell);
+            });
+        }
+
+        function detectItem(event) {
+            if (clicksRemaining <= 0) return;
+
+            const cell = event.target;
+            const index = cell.getAttribute('data-index');
+
+            if (cell.classList.contains('detected')) return;
+
+            const item = gameGrid[index];
+            if (item) {
+                cell.textContent = item;
+                score += points[item] || 0;
+            } else {
+                cell.textContent = 'Iron Ring';
+            }
+
+            cell.classList.add('detected');
+            clicksRemaining--;
+            updateScore();
+
+            if (clicksRemaining === 0) {
+                const playerName = document.getElementById('playerName').value || 'Player';
+                alert(`Game over, ${playerName}! Your final score is: ${score}`);
+            }
+        }
+
+        function updateScore() {
+            scoreElement.textContent = `Score: ${score} | Clicks Remaining: ${clicksRemaining} (You have 10 digs per game)`;
+        }
+
+        function startGame() {
+            score = 0;
+            clicksRemaining = 10;
+            updateScore();
+            createGrid();
+            renderGrid();
+        }
+
+        // Initialize the game on page load
+        startGame();
+    </script>
+</body>
+</html>
