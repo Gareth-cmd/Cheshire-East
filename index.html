@@ -96,6 +96,17 @@
 
         const scoreElement = document.getElementById('score');
         const gameElement = document.getElementById('game');
+        const playerNameInput = document.getElementById('playerName');
+
+        // Disable input on Enter key and start game
+        playerNameInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.disabled = true; // Disable the input box
+                alert(`Welcome, ${this.value || 'Player'}! You can now start playing.`);
+                startGame(); // Ensure the game starts after input
+            }
+        });
 
         function createGrid() {
             gameGrid = Array.from({ length: totalCells }, () => {
@@ -136,7 +147,7 @@
             updateScore();
 
             if (clicksRemaining === 0) {
-                const playerName = document.getElementById('playerName').value || 'Player';
+                const playerName = playerNameInput.value || 'Player';
                 alert(`Game over, ${playerName}! Your final score is: ${score}`);
             }
         }
@@ -148,13 +159,15 @@
         function startGame() {
             score = 0;
             clicksRemaining = 10;
-            updateScore();
+            playerNameInput.disabled = true; // Keep input disabled during the game
             createGrid();
+            updateScore();
             renderGrid();
         }
 
         // Initialize the game on page load
-        startGame();
+        createGrid();
+        renderGrid();
     </script>
 </body>
 </html>
